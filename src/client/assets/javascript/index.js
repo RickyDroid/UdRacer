@@ -81,18 +81,25 @@ async function handleCreateRace() {
 	renderAt('#race', renderRaceStartView(trackName));
 	
 	try{
+		// NOTE :- whenever raceID === 1, startRace will fail.
+		// if < 1 or > 1 startRace works ok.
+		// This seems to be bug in the game server
 		let raceID = await createRace(player_id, track_id)
 		.then((raceData) => store.race_id = (raceData.ID - 1))
-    	await runCountdown();
+
+        await runCountdown();
+	
 		await startRace(raceID);
-		await runRace(raceID);
+
+		runRace(raceID);
+		
 	}catch(error){
 		//MAIN ERROR COLLECTION POINT
 		console.log(error); 
 	}
 }
 
-async function runRace(raceID) {
+function runRace(raceID) {
 	try{
 		return new Promise(resolve => {
 			const raceInterval = setInterval(monitorRace, 500);
@@ -140,7 +147,7 @@ async function runCountdown() {
 }
 
 function handleSelectTrack(target) {
-	// remove class selected from all track options
+	//remove class selected from all track options
 	const selected = document.querySelector('#tracks .selected')
 	if(selected) {
 		selected.classList.remove('selected')
@@ -151,7 +158,7 @@ function handleSelectTrack(target) {
 }
 
 function handleSelectPodRacer(target) {
-	// remove class selected from all racer options
+	//remove class selected from all racer options
 	const selected = document.querySelector('#racers .selected')
 	if(selected) {
 		selected.classList.remove('selected')
@@ -349,7 +356,7 @@ function startRace(id) {
 		...defaultFetchOpts(),
 	})
 	.catch(err => {
-		throw new Error("Problem with getRace request::", err)
+		throw new Error("Problem with startRace request::", err)
 	})
 }
 
